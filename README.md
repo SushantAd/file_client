@@ -22,12 +22,13 @@ or B:
 
 ####Suggested Solution:
 1. Idiomatic approach, using custom code than Akka streams.
-2. Akka HTTP based application exposing a single route with Post method get /api/server/get-or-create/{{requestId}}.
-3. Use Akka Actor for async calls and adding 5s delay.
+2. Akka HTTP based application exposing a single route with method get /api/server/get-or-create/{{requestId}}.
+3. Use Concurrent Hashmap to manage throttle keep track of request and resource, in case 
 4. Store file in a central location.
 
 ####Assumptions:
-
+1. Throttling will be based on server request time.
+2. RequestId is used to identify unique resource.
 
 ####Acceptance Criteria:
 1. When a user calls the API, a file is created in a central location and empty response for a unique requestId with 202 status code is returned.
@@ -43,14 +44,46 @@ You need to download and install sbt for this application to run.
 
 Once you have sbt installed, type/run the following command in the terminal:
 
+Pre-requisite
+1. Please change central-directory to a proper directory where the file is to be saved, we are not force creating directories at this point.
+   file_store{
+   central-directory = "C:\\centralDirClient"
+   default-extension = "txt"
+   }
+
 ```bash
 sbt run
 or
 Run via IDE
 ```
+Url: http://127.0.0.1:9090/api/client/get-or-create/testRequest1
 
-Limitation:
+###Limitation:
+1. Throttle is based on server processing time (Reason- Server takes a min 5s, which would lead to multiple retries call to the server).
+2. Max retry is currently not set and will keep on retrying after 500ms. (Can be easily extended to add maxRetries)
 
-Extensions:
+###Extensions:
+1. Throttle can be extended by adding timestamp check when fetching from cache.2
+2. Unit and Integrations tests can be better used for edge cases.
 
-####Note:
+
+###Important - For Testing
+To run Unit test:
+```bash
+sbt test
+or
+Run test via IDE
+```
+
+To run Integration test:
+Prerequisites:
+1. File-Server should be online or will throw 500 error. 
+2. File-Client-Server should be online or will throw 500 error.
+3. Using single conf file so testing will also create file in the same central directory (will not work if central dir value is wrong in config.)
+4. File will be created and deleted after IT is completed. (File name: "t_e_s_t_file_dont_use.txt")
+```bash
+sbt it:test
+or
+Run it test via IDE
+```
+

@@ -9,16 +9,18 @@ import akka.util.Timeout
 import com.demo.file.client.model.{CustomMessage, PathBusyRejection}
 import com.demo.file.client.service.FileService
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import com.demo.file.client.util.ConfigUtil
+import com.demo.file.client.util.{ConfigUtil, RateLimitChecker}
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-object FileClientServer {
+object FileClientServer extends LazyLogging{
 
   implicit val system: ActorSystem = ActorSystem()
-  val fileService = new FileService(system)
+  val rateLimitChecker = new RateLimitChecker(system.scheduler)
+  val fileService = new FileService(system, rateLimitChecker)
 
   def main(args: Array[String]): Unit = {
     val rejectionHandler = RejectionHandler.newBuilder()
@@ -33,7 +35,7 @@ object FileClientServer {
     val route =
       handleRejections(rejectionHandler) {
         pathPrefix("api") {
-          pathPrefix("server") {
+          pathPrefix("client") {
             get {
               path("get-or-create" / Segment) { resourceName =>
                 implicit val timeout: Timeout = ConfigUtil.maxTimeout.seconds
@@ -47,10 +49,10 @@ object FileClientServer {
         }
       }
 
-    Http().newServerAt("127.0.0.1", 9090).bind(route).onComplete {
-      case Success(_) => println("Listening for requests on http://127.0.0.1:9090")
+    Http().newServerAt(ConfigUtil.applicationHost, ConfigUtil.applicationPort).bind(route).onComplete {
+      case Success(_) => logger.info(s"Listening for requests on http://${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}")
       case Failure(ex) =>
-        println("Failed to bind to 127.0.0.9090")
+        logger.info("Failed to bind to ${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}")
         ex.printStackTrace()
     }
 
