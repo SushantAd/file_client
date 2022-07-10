@@ -29,36 +29,6 @@ class FileClientServerIntegrationTest extends AnyWordSpec with Matchers with Sca
     method = HttpMethods.GET,
     uri = url
   )
-  val testRoute =
-    pathPrefix("api") {
-      pathPrefix("client") {
-        get {
-          path("get-or-create") {
-            complete(responseBody)
-          }
-        }
-      }
-    }
-  val rejectRoute =
-    pathPrefix("api") {
-      pathPrefix("client") {
-        get {
-          path("get-or-create") {
-            complete(StatusCodes.Accepted)
-          }
-        }
-      }
-    }
-  val errorRoute =
-    pathPrefix("api") {
-      pathPrefix("client") {
-        get {
-          path("get-or-create") {
-            complete(StatusCodes.InternalServerError)
-          }
-        }
-      }
-    }
 
   override protected def beforeAll(): Unit = {
     println("Deleting test file before test : " + Files.deleteIfExists(Paths.get(fileDirUrl)))
@@ -84,5 +54,4 @@ class FileClientServerIntegrationTest extends AnyWordSpec with Matchers with Sca
       response.status shouldEqual StatusCodes.OK
     }
   }
-
 }
