@@ -20,17 +20,17 @@ HTTP response code 202 (Accepted) if the resource value is not yet available
 or B:
 {"requestId”: "{{S1}}", "fileContent": "{{S2}}"} - if the resource is available in a local file
 
-####Suggested Solution:
+#### Suggested Solution:
 1. Idiomatic approach, using custom code than Akka streams.
 2. Akka HTTP based application exposing a single route with method get /api/server/get-or-create/{{requestId}}.
 3. Use Concurrent Hashmap to manage throttle keep track of request and resource, in case 
 4. Store file in a central location.
 
-####Assumptions:
+#### Assumptions:
 1. Throttling will be based on server request time.
 2. RequestId is used to identify unique resource.
 
-####Acceptance Criteria:
+#### Acceptance Criteria:
 1. When a user calls the API, a file is created in a central location and empty response for a unique requestId with 202 status code is returned.
 2. When a user calls the API with previous requestId, file is found in central location and fileContent is returned with 200 status code. 
 3. When a user calls the API and error occurs in the server, an empty response with 500 (Internal error) status code is returned.
@@ -81,6 +81,7 @@ Prerequisites:
 2. File-Client-Server should be online or will throw 500 error.
 3. Using single conf file so testing will also create file in the same central directory (will not work if central dir value is wrong in config.)
 4. File will be created and deleted after IT is completed. (File name: "t_e_s_t_file_dont_use.txt")
+5. Both services should have different file location.
 ```bash
 sbt it:test
 or
