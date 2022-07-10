@@ -52,7 +52,7 @@ object FileClientServer extends LazyLogging{
     Http().newServerAt(ConfigUtil.applicationHost, ConfigUtil.applicationPort).bind(route).onComplete {
       case Success(_) => logger.info(s"Listening for requests on http://${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}")
       case Failure(ex) =>
-        logger.info("Failed to bind to ${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}")
+        logger.info(s"Failed to bind to ${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}")
         ex.printStackTrace()
     }
 

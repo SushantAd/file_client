@@ -22,7 +22,7 @@ class FileClientServerIntegrationTest extends AnyWordSpec with Matchers with Sca
 
   val requestId = "t_e_s_t_file_dont_use"
   val fileDirUrl = s"${ConfigUtil.centralDirectory}\\${requestId}.${ConfigUtil.defaultFileExtension}"
-  val url = s"http://localhost:9090/api/client/get-or-create/${requestId}"
+  val url = s"http://${ConfigUtil.applicationHost}:${ConfigUtil.applicationPort}/api/client/get-or-create/${requestId}"
 
   val responseBody: JsValue = FileResponse("test1", "test1_random").toJson
   val request: HttpRequest = HttpRequest(

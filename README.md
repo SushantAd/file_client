@@ -63,7 +63,7 @@ Url: http://127.0.0.1:9090/api/client/get-or-create/testRequest1
 2. Max retry is currently not set and will keep on retrying after 500ms. (Can be easily extended to add maxRetries)
 
 ###Extensions:
-1. Throttle can be extended by adding timestamp check when fetching from cache.2
+1. Throttle can be extended by adding timestamp check when fetching from cache.
 2. Unit and Integrations tests can be better used for edge cases.
 
 
